@@ -5,10 +5,15 @@ import UserContext from '../../../contexts/UserContext';
 
 export default function Payment() {
   const [tickets, setTickets] = useState([]);
+  const [value, setValue] = useState();
+
   const [isRemote, setIsRemote] = useState(false);
   const [includesHotel, setIncludesHotel] = useState(false);
-  const [firstSelected, setFirstSelected] = useState(false);
-  const [secondSelected, setSecondSelected] = useState(false);
+
+  const [presentialSelected, setPresentialSelected] = useState(false);
+  const [remoteSelected, setRemoteSelected] = useState(false);
+  const [hotelSelected, setHotelSelected] = useState(false);
+  const [noHotelSelected, setNoHotelSelected] = useState(false);
 
   const { userData } = useContext(UserContext);
 
@@ -35,24 +40,6 @@ export default function Payment() {
     });
   }, []);
 
-  function selectFirstButton() {
-    if (firstSelected) {
-      setFirstSelected(false);
-      return;
-    }
-    setFirstSelected(true);
-    return;
-  }
-
-  function selectSecondButton() {
-    if (secondSelected) {
-      setSecondSelected(false);
-      return;
-    }
-    setSecondSelected(true);
-    return;
-  }
-
   return (
     <PageContainer>
       <MainTitle>
@@ -62,7 +49,7 @@ export default function Payment() {
         <h2>Primeiro, escolha sua modalidade de ingresso</h2>
       </SecondaryTitle>
       <TicketsContainer>
-        <TicketBox onClick={() => selectFirstButton()}>
+        <TicketBox onClick={() => {setPresentialSelected(!presentialSelected); setRemoteSelected(false);}} selected={presentialSelected}>
           <h3>Presencial</h3>
           <h4>R$ 250</h4>
           {/* {tickets.map((ticket) => (
@@ -71,28 +58,28 @@ export default function Payment() {
             </div>
           ))} */}
         </TicketBox>
-        <TicketBox onClick={() => selectFirstButton()}>
+        <TicketBox onClick={() => {setRemoteSelected(!remoteSelected); setPresentialSelected(false);}} selected={remoteSelected} >
           <h3>Online</h3>
           <h4>R$ 100</h4>
         </TicketBox>
       </TicketsContainer>
-      <SecondInnerContainer visible={firstSelected}>
+      <SecondInnerContainer visible={presentialSelected}>
         <SecondaryTitle>
           <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
         </SecondaryTitle>
         <TicketsContainer>
-          <TicketBox onClick={() => selectSecondButton()}>
+          <TicketBox onClick={() => {setHotelSelected(!hotelSelected); setNoHotelSelected(false);}} selected={hotelSelected}>
             <h3>Sem Hotel</h3>
             <h4>+ R$ 0</h4>
             {/* {tickets} */}
           </TicketBox>
-          <TicketBox onClick={() => selectSecondButton()}>
+          <TicketBox onClick={() => {setNoHotelSelected(!noHotelSelected); setHotelSelected(false);}} selected={noHotelSelected}>
             <h3>Com Hotel</h3>
             <h4>+ R$ 350</h4>
           </TicketBox>
         </TicketsContainer>
       </SecondInnerContainer>
-      <ThirdInnerContainer visible={secondSelected}>
+      <ThirdInnerContainer visible={remoteSelected || hotelSelected || noHotelSelected}>
         <SecondaryTitle>
           <h2>
             Fechado! O total ficou em <strong>R$ 600</strong>. Agora é só confirmar:
@@ -160,7 +147,8 @@ const TicketBox = styled.button`
   justify-content: center;
   row-gap: 3px;
   border: 1px solid #cecece;
-  /* background-color: #FFEED2; */
+
+  background-color: ${props => props.selected? '#FFEED2' : '#FFFFFF'};
 
   h3 {
     font-family: 'Roboto';

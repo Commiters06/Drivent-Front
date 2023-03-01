@@ -33,6 +33,8 @@ export default function App() {
               <Route path="/enroll" element={<Enroll />} />
               <Route path="/sign-in" element={<SignIn />} />
 
+              <Route Path="test" element={<SignIn/>}/>
+
               <Route
                 path="/dashboard"
                 element={
