@@ -3,10 +3,12 @@ import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
 import TicketTypeBox from '../../../components/Payment/TicketType';
+import { set } from 'date-fns';
 
 export default function Payment() {
   const [tickets, setTickets] = useState([]);
-  const [value, setValue] = useState ();
+  const [baseValue, setBaseValue] = useState (0);
+  const [aditionalValue, setAdiotionalValue] = useState (0);
 
   const [isRemote, setIsRemote] = useState(false);
   const [includesHotel, setIncludesHotel] = useState(false);
@@ -52,10 +54,12 @@ export default function Payment() {
       <TicketsContainer>
 
         <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected} 
-          type={'Presencial'} price={250} key={1} aditional={false}/>
+          type={'Presencial'} price={250} key={1} 
+          aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
 
         <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected} 
-          type={'Online'} price={100} key={2} aditional={false}/>
+          type={'Online'} price={100} key={2} 
+          aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
 
       </TicketsContainer>
       <SecondInnerContainer visible={presentialSelected}>
@@ -65,17 +69,19 @@ export default function Payment() {
         <TicketsContainer>
 
           <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected} 
-            type={'Sem Hotel'} price={0} key={3} aditional={true}/>
+            type={'Sem Hotel'} price={0} key={3} 
+            aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
           
           <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
-            type={'Com Hotel'} price={350} key={4} aditional={true}/>
+            type={'Com Hotel'} price={350} key={4} 
+            aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
 
         </TicketsContainer>
       </SecondInnerContainer>
       <ThirdInnerContainer visible={remoteSelected || hotelSelected || noHotelSelected}>
         <SecondaryTitle>
           <h2>
-            Fechado! O total ficou em <strong>R$ {value}</strong>. Agora é só confirmar:
+            Fechado! O total ficou em <strong>R$ {baseValue + aditionalValue}</strong>. Agora é só confirmar:
           </h2>
         </SecondaryTitle>
         <ConfirmTicketButton>

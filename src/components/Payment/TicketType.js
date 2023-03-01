@@ -1,13 +1,25 @@
 import { useEffect } from 'react';
 import styled from 'styled-components';
 
-export default function TicketTypeBox({ selected, selectedFunction, exchangeSelected, type, price, aditional }) {
-  function chooseType() {
+export default function TicketTypeBox({ selected, selectedFunction, exchangeSelected, type, price, aditional, finalPriceChange, parentalDependency }) {
+  if(!parentalDependency) {
+    finalPriceChange(0);
+    selectedFunction(false);
+  }
+
+  function toggleType() {
+    if(selected) {
+      finalPriceChange(0);
+    }else{
+      finalPriceChange(price);
+    }
+
     selectedFunction(!selected); 
     exchangeSelected(false); 
   }
+
   return(
-    <TicketBox onClick={() => chooseType()} selected={selected}>
+    <TicketBox onClick={() => toggleType()} selected={selected}>
       <h3>{type}</h3>
       <h4>{aditional? '+': ''} R$ {price}</h4>
     </TicketBox>
