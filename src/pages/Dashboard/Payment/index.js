@@ -4,19 +4,27 @@ import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
 import TicketTypeBox from '../../../components/Payment/TicketType';
 import { set } from 'date-fns';
+import { getTicket } from '../../../services/ticketApi';
+
 
 export default function Payment() {
+  // eslint-disable-next-line no-unused-vars
   const [tickets, setTickets] = useState([]);
   const [baseValue, setBaseValue] = useState (0);
   const [aditionalValue, setAdiotionalValue] = useState (0);
 
-  const [isRemote, setIsRemote] = useState(false);
-  const [includesHotel, setIncludesHotel] = useState(false);
+
+  // const [isRemote, setIsRemote] = useState(false);
+  // const [includesHotel, setIncludesHotel] = useState(false);
 
   const [presentialSelected, setPresentialSelected] = useState(false);
   const [remoteSelected, setRemoteSelected] = useState(false);
   const [hotelSelected, setHotelSelected] = useState(false);
   const [noHotelSelected, setNoHotelSelected] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [paymentComplete, setPaymentComplete] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [ticket, setTicket] = useState(null);
 
   const { userData } = useContext(UserContext);
 
@@ -43,54 +51,112 @@ export default function Payment() {
     });
   }, []);
 
+  function summaryText() {
+    if(presentialSelected && noHotelSelected) return 'Presencial + Com Hotel';
+    
+    if(presentialSelected && hotelSelected) return 'Presencial sem hotel';
+
+    if(remoteSelected) return 'Online';
+  }
+
+  async function reservTicket() {
+    setPaymentComplete(true);
+    let data = await getTicket(userData.token);
+    setTicket(data);
+  }
+
   return (
     <PageContainer>
       <MainTitle>
         <h1>Ingresso e pagamento</h1>
       </MainTitle>
-      <SecondaryTitle>
-        <h2>Primeiro, escolha sua modalidade de ingresso</h2>
-      </SecondaryTitle>
-      <TicketsContainer>
-
-        <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected} 
-          type={'Presencial'} price={250} key={1} 
-          aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
-
-        <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected} 
-          type={'Online'} price={100} key={2} 
-          aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
-
-      </TicketsContainer>
-      <SecondInnerContainer visible={presentialSelected}>
-        <SecondaryTitle>
-          <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
-        </SecondaryTitle>
-        <TicketsContainer>
-
-          <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected} 
-            type={'Sem Hotel'} price={0} key={3} 
-            aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+      
+      {!paymentComplete ? (
+        <div>
+          <SecondaryTitle>
+            <h2>Primeiro, escolha sua modalidade de ingresso</h2>
+          </SecondaryTitle>
+          <TicketsContainer>
           
-          <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
-            type={'Com Hotel'} price={350} key={4} 
-            aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+            <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected} 
+              type={'Presencial'} price={250} key={1} 
+              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
 
-        </TicketsContainer>
-      </SecondInnerContainer>
-      <ThirdInnerContainer visible={remoteSelected || hotelSelected || noHotelSelected}>
-        <SecondaryTitle>
-          <h2>
-            Fechado! O total ficou em <strong>R$ {baseValue + aditionalValue}</strong>. Agora é só confirmar:
-          </h2>
-        </SecondaryTitle>
-        <ConfirmTicketButton>
-          <h1>RESERVAR INGRESSO</h1>
-        </ConfirmTicketButton>
-      </ThirdInnerContainer>
+            <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected} 
+              type={'Online'} price={100} key={2} 
+              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
+              
+          </TicketsContainer>
+          <SecondInnerContainer visible={presentialSelected}>
+            <SecondaryTitle>
+              <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
+            </SecondaryTitle>
+            <TicketsContainer>
+              
+              <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected} 
+                type={'Sem Hotel'} price={0} key={3} 
+                aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+
+              <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
+                type={'Com Hotel'} price={350} key={4} 
+                aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+
+            </TicketsContainer>
+          </SecondInnerContainer>
+          <ThirdInnerContainer visible={remoteSelected || hotelSelected || noHotelSelected}>
+            <SecondaryTitle>
+              <h2>
+                Fechado! O total ficou em <strong>R$ {baseValue + aditionalValue}</strong>. Agora é só confirmar:
+              </h2>
+            </SecondaryTitle>
+            <ConfirmTicketButton onClick={reservTicket}>
+              <h1>RESERVAR INGRESSO</h1>
+            </ConfirmTicketButton>
+          </ThirdInnerContainer>
+        </div>
+      ) : (
+        <div>
+          <PaymentSummary>
+            <h1>{summaryText()}</h1>
+            <p>{ticket?.TicketType.price ? `R$ ${ticket.TicketType.price}` : 'Erro! ticket não encontrado.'}</p>
+          </PaymentSummary>
+        </div>
+      )}
+
     </PageContainer>
   );
 }
+
+const PaymentSummary = styled.div`
+  background: #ffeed2;
+  border-radius: 20px;
+  width: 290px;
+  height: 108px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+
+  h1 {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 19px;
+    text-align: center;
+    color: #454545;
+  }
+
+  p {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16px;
+    text-align: center;
+    color: #898989;
+  }
+`;
 
 const PageContainer = styled.div`
   background-color: white;
@@ -133,6 +199,7 @@ const TicketsContainer = styled.div`
   column-gap: 24px;
   margin-bottom: 44px;
 `;
+
 
 const ConfirmTicketButton = styled.button`
   height: 37px;
