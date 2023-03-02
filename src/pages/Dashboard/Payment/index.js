@@ -3,27 +3,19 @@ import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
 import TicketTypeBox from '../../../components/Payment/TicketType';
-import { set } from 'date-fns';
 import { getTicket } from '../../../services/ticketApi';
 
-
 export default function Payment() {
-  // eslint-disable-next-line no-unused-vars
   const [tickets, setTickets] = useState([]);
   const [baseValue, setBaseValue] = useState (0);
   const [aditionalValue, setAdiotionalValue] = useState (0);
-
-
-  // const [isRemote, setIsRemote] = useState(false);
-  // const [includesHotel, setIncludesHotel] = useState(false);
 
   const [presentialSelected, setPresentialSelected] = useState(false);
   const [remoteSelected, setRemoteSelected] = useState(false);
   const [hotelSelected, setHotelSelected] = useState(false);
   const [noHotelSelected, setNoHotelSelected] = useState(false);
-  // eslint-disable-next-line no-unused-vars
+
   const [paymentComplete, setPaymentComplete] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [ticket, setTicket] = useState(null);
 
   const { userData } = useContext(UserContext);
@@ -40,13 +32,9 @@ export default function Payment() {
     promise.then((res) => {
       const newArr = res.data;
       setTickets(newArr);
-      // eslint-disable-next-line no-console
-      console.log(newArr, 'se res');
     });
     promise.catch((err) => {
-      // eslint-disable-next-line no-console
       console.log(err);
-      // eslint-disable-next-line no-console
       console.log(config);
     });
   }, []);
@@ -77,29 +65,38 @@ export default function Payment() {
             <h2>Primeiro, escolha sua modalidade de ingresso</h2>
           </SecondaryTitle>
           <TicketsContainer>
-          
-            <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected} 
-              type={'Presencial'} price={250} key={1} 
-              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
 
-            <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected} 
-              type={'Online'} price={100} key={2} 
-              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
-              
+            {tickets.length === 3?
+              <>
+                <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected} 
+                  ticketInfo={tickets.filter((e) => !e.isRemote && !e.includesHotel)[0]} key={1} 
+                  aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
+
+                <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected} 
+                  ticketInfo={tickets.filter((e) => e.isRemote)[0]} price={100} key={2} 
+                  aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
+              </>
+              : null}
+
           </TicketsContainer>
           <SecondInnerContainer visible={presentialSelected}>
             <SecondaryTitle>
               <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
             </SecondaryTitle>
             <TicketsContainer>
-              
-              <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected} 
-                type={'Sem Hotel'} price={0} key={3} 
-                aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
 
-              <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
-                type={'Com Hotel'} price={350} key={4} 
-                aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+              {tickets.length === 3?
+                <>
+                  <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected} 
+                    ticketInfo={{ price: 0, name: 'Sem Hotel' }} key={3} 
+                    aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+
+                  <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
+                    ticketInfo={tickets.filter((e) => !e.isRemote && e.includesHotel)[0]} key={4} 
+                    aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+
+                </>
+                : null}
 
             </TicketsContainer>
           </SecondInnerContainer>
@@ -199,7 +196,6 @@ const TicketsContainer = styled.div`
   column-gap: 24px;
   margin-bottom: 44px;
 `;
-
 
 const ConfirmTicketButton = styled.button`
   height: 37px;
