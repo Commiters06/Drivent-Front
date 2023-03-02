@@ -3,27 +3,11 @@ import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
 import TicketTypeBox from '../../../components/Payment/TicketType';
-import { set } from 'date-fns';
 import { getTicket } from '../../../services/ticketApi';
-
+import TicketTypeSection from '../../../components/Payment/TicketTypeSection';
 
 export default function Payment() {
-  // eslint-disable-next-line no-unused-vars
-  const [tickets, setTickets] = useState([]);
-  const [baseValue, setBaseValue] = useState (0);
-  const [aditionalValue, setAdiotionalValue] = useState (0);
-
-
-  // const [isRemote, setIsRemote] = useState(false);
-  // const [includesHotel, setIncludesHotel] = useState(false);
-
-  const [presentialSelected, setPresentialSelected] = useState(false);
-  const [remoteSelected, setRemoteSelected] = useState(false);
-  const [hotelSelected, setHotelSelected] = useState(false);
-  const [noHotelSelected, setNoHotelSelected] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [paymentComplete, setPaymentComplete] = useState(false);
-  // eslint-disable-next-line no-unused-vars
   const [ticket, setTicket] = useState(null);
 
   const { userData } = useContext(UserContext);
@@ -36,33 +20,26 @@ export default function Payment() {
         Authorization: `Bearer ${token}`,
       },
     };
-    let promise = axios.get(`${URL}/tickets/types`, config);
+    let promise = axios.get(`${URL}/tickets/`, config);
     promise.then((res) => {
-      const newArr = res.data;
-      setTickets(newArr);
-      // eslint-disable-next-line no-console
-      console.log(newArr, 'se res');
+      const myTicket = res.data;
+      setTicket(myTicket);
+      setPaymentComplete(true);
     });
     promise.catch((err) => {
-      // eslint-disable-next-line no-console
       console.log(err);
-      // eslint-disable-next-line no-console
       console.log(config);
     });
-  }, []);
+  });
 
   function summaryText() {
-    if(presentialSelected && noHotelSelected) return 'Presencial + Com Hotel';
-    
-    if(presentialSelected && hotelSelected) return 'Presencial sem hotel';
+    console.log(ticket);
 
-    if(remoteSelected) return 'Online';
-  }
+    if(ticket.isRemote) return 'Online';
 
-  async function reservTicket() {
-    setPaymentComplete(true);
-    let data = await getTicket(userData.token);
-    setTicket(data);
+    if(!ticket.isRemote && ticket.includesHotel) return 'Presencial + Com Hotel';
+   
+    if(!ticket.isRemote && !ticket.includesHotel) return 'Presencial sem hotel';
   }
 
   return (
@@ -72,48 +49,7 @@ export default function Payment() {
       </MainTitle>
       
       {!paymentComplete ? (
-        <div>
-          <SecondaryTitle>
-            <h2>Primeiro, escolha sua modalidade de ingresso</h2>
-          </SecondaryTitle>
-          <TicketsContainer>
-          
-            <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected} 
-              type={'Presencial'} price={250} key={1} 
-              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
-
-            <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected} 
-              type={'Online'} price={100} key={2} 
-              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
-              
-          </TicketsContainer>
-          <SecondInnerContainer visible={presentialSelected}>
-            <SecondaryTitle>
-              <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
-            </SecondaryTitle>
-            <TicketsContainer>
-              
-              <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected} 
-                type={'Sem Hotel'} price={0} key={3} 
-                aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
-
-              <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
-                type={'Com Hotel'} price={350} key={4} 
-                aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
-
-            </TicketsContainer>
-          </SecondInnerContainer>
-          <ThirdInnerContainer visible={remoteSelected || hotelSelected || noHotelSelected}>
-            <SecondaryTitle>
-              <h2>
-                Fechado! O total ficou em <strong>R$ {baseValue + aditionalValue}</strong>. Agora é só confirmar:
-              </h2>
-            </SecondaryTitle>
-            <ConfirmTicketButton onClick={reservTicket}>
-              <h1>RESERVAR INGRESSO</h1>
-            </ConfirmTicketButton>
-          </ThirdInnerContainer>
-        </div>
+        <TicketTypeSection completeReservation={setPaymentComplete} chooseTicket={setTicket}/>
       ) : (
         <div>
           <PaymentSummary>
@@ -199,7 +135,6 @@ const TicketsContainer = styled.div`
   column-gap: 24px;
   margin-bottom: 44px;
 `;
-
 
 const ConfirmTicketButton = styled.button`
   height: 37px;
