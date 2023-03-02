@@ -35,11 +35,11 @@ export default function Payment() {
   function summaryText() {
     console.log(ticket);
 
-    if(ticket.isRemote) return 'Online';
+    if(ticket.TicketType.isRemote) return 'Online';
 
-    if(!ticket.isRemote && ticket.includesHotel) return 'Presencial + Com Hotel';
+    if(!ticket.TicketType.isRemote && ticket.TicketType.includesHotel) return 'Presencial + Com Hotel';
    
-    if(!ticket.isRemote && !ticket.includesHotel) return 'Presencial sem hotel';
+    if(!ticket.TicketType.isRemote && !ticket.TicketType.includesHotel) return 'Presencial sem hotel';
   }
 
   return (
