@@ -2,12 +2,17 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
+import TicketTypeBox from '../../../components/Payment/TicketType';
+import { set } from 'date-fns';
 import { getTicket } from '../../../services/ticketApi';
+
 
 export default function Payment() {
   // eslint-disable-next-line no-unused-vars
   const [tickets, setTickets] = useState([]);
-  // const [value, setValue] = useState();
+  const [baseValue, setBaseValue] = useState (0);
+  const [aditionalValue, setAdiotionalValue] = useState (0);
+
 
   // const [isRemote, setIsRemote] = useState(false);
   // const [includesHotel, setIncludesHotel] = useState(false);
@@ -65,70 +70,43 @@ export default function Payment() {
       <MainTitle>
         <h1>Ingresso e pagamento</h1>
       </MainTitle>
+      
       {!paymentComplete ? (
         <div>
           <SecondaryTitle>
             <h2>Primeiro, escolha sua modalidade de ingresso</h2>
           </SecondaryTitle>
           <TicketsContainer>
-            <TicketBox
-              onClick={() => {
-                setPresentialSelected(!presentialSelected);
-                setRemoteSelected(false);
-              }}
-              selected={presentialSelected}
-            >
-              <h3>Presencial</h3>
-              <h4>R$ 250</h4>
-              {/* {tickets.map((ticket) => (
-                  <div key={ticket.id}>
-                    {ticket.name}, {ticket.price}
-                  </div>
-                ))} */}
-            </TicketBox>
-            <TicketBox
-              onClick={() => {
-                setRemoteSelected(!remoteSelected);
-                setPresentialSelected(false);
-              }}
-              selected={remoteSelected}
-            >
-              <h3>Online</h3>
-              <h4>R$ 100</h4>
-            </TicketBox>
+          
+            <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected} 
+              type={'Presencial'} price={250} key={1} 
+              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
+
+            <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected} 
+              type={'Online'} price={100} key={2} 
+              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
+              
           </TicketsContainer>
           <SecondInnerContainer visible={presentialSelected}>
             <SecondaryTitle>
               <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
             </SecondaryTitle>
             <TicketsContainer>
-              <TicketBox
-                onClick={() => {
-                  setHotelSelected(!hotelSelected);
-                  setNoHotelSelected(false);
-                }}
-                selected={hotelSelected}
-              >
-                <h3>Sem Hotel</h3>
-                <h4>+ R$ 0</h4>
-                {/* {tickets} */}
-              </TicketBox>
-              <TicketBox
-                onClick={() => {
-                  setNoHotelSelected(!noHotelSelected);
-                  setHotelSelected(false);
-                }}
-                selected={noHotelSelected}
-              >
-                <h3>Com Hotel</h3>
-                <h4>+ R$ 350</h4>
-              </TicketBox>
+              
+              <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected} 
+                type={'Sem Hotel'} price={0} key={3} 
+                aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+
+              <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
+                type={'Com Hotel'} price={350} key={4} 
+                aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+
             </TicketsContainer>
           </SecondInnerContainer>
           <ThirdInnerContainer visible={remoteSelected || hotelSelected || noHotelSelected}>
             <SecondaryTitle>
               <h2>
-                Fechado! O total ficou em <strong>R$ 600</strong>. Agora é só confirmar:
+                Fechado! O total ficou em <strong>R$ {baseValue + aditionalValue}</strong>. Agora é só confirmar:
               </h2>
             </SecondaryTitle>
             <ConfirmTicketButton onClick={reservTicket}>
@@ -144,6 +122,7 @@ export default function Payment() {
           </PaymentSummary>
         </div>
       )}
+
     </PageContainer>
   );
 }
@@ -220,41 +199,7 @@ const TicketsContainer = styled.div`
   column-gap: 24px;
   margin-bottom: 44px;
 `;
-const TicketBox = styled.button`
-  height: 145px;
-  width: 145px;
-  left: 341px;
-  top: 323px;
-  border-radius: 20px;
-  border: 1px solid #cecece;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  row-gap: 3px;
-  border: 1px solid #cecece;
 
-  background-color: ${(props) => (props.selected ? '#FFEED2' : '#FFFFFF')};
-
-  h3 {
-    font-family: 'Roboto';
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 19px;
-    letter-spacing: 0em;
-    text-align: center;
-    color: #454545;
-  }
-  h4 {
-    font-family: 'Roboto';
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 16px;
-    letter-spacing: 0em;
-    text-align: center;
-    color: #898989;
-  }
-`;
 
 const ConfirmTicketButton = styled.button`
   height: 37px;
@@ -263,6 +208,7 @@ const ConfirmTicketButton = styled.button`
   background-color: #e0e0e0;
   border: none;
   box-shadow: 0px 2px 10px 0px #00000040;
+  cursor: pointer;
 
   h1 {
     font-family: 'Roboto';
