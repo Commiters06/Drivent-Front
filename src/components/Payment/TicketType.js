@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
-export default function TicketTypeBox({ selected, selectedFunction, exchangeSelected, ticketInfo, aditional, finalPriceChange, parentalDependency }) {
+export default function TicketTypeBox({ selected, selectedFunction, exchangeSelected, ticketInfo, aditional, finalPriceChange, parentalDependency, chooseFinal }) {
+  console.log(ticketInfo);
+
   if(!parentalDependency) {
     finalPriceChange(0);
     selectedFunction(false);
@@ -13,6 +15,7 @@ export default function TicketTypeBox({ selected, selectedFunction, exchangeSele
       finalPriceChange(ticketInfo.price);
     }
 
+    chooseFinal(ticketInfo.id);
     selectedFunction(!selected); 
     exchangeSelected(false); 
   }

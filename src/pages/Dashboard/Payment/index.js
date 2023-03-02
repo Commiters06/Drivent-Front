@@ -4,17 +4,9 @@ import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
 import TicketTypeBox from '../../../components/Payment/TicketType';
 import { getTicket } from '../../../services/ticketApi';
+import TicketTypeSection from '../../../components/Payment/TicketTypeSection';
 
 export default function Payment() {
-  const [tickets, setTickets] = useState([]);
-  const [baseValue, setBaseValue] = useState (0);
-  const [aditionalValue, setAdiotionalValue] = useState (0);
-
-  const [presentialSelected, setPresentialSelected] = useState(false);
-  const [remoteSelected, setRemoteSelected] = useState(false);
-  const [hotelSelected, setHotelSelected] = useState(false);
-  const [noHotelSelected, setNoHotelSelected] = useState(false);
-
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [ticket, setTicket] = useState(null);
 
@@ -28,29 +20,26 @@ export default function Payment() {
         Authorization: `Bearer ${token}`,
       },
     };
-    let promise = axios.get(`${URL}/tickets/types`, config);
+    let promise = axios.get(`${URL}/tickets/`, config);
     promise.then((res) => {
-      const newArr = res.data;
-      setTickets(newArr);
+      const myTicket = res.data;
+      setTicket(myTicket);
+      setPaymentComplete(true);
     });
     promise.catch((err) => {
       console.log(err);
       console.log(config);
     });
-  }, []);
+  });
 
   function summaryText() {
-    if(presentialSelected && noHotelSelected) return 'Presencial + Com Hotel';
-    
-    if(presentialSelected && hotelSelected) return 'Presencial sem hotel';
+    console.log(ticket);
 
-    if(remoteSelected) return 'Online';
-  }
+    if(ticket.isRemote) return 'Online';
 
-  async function reservTicket() {
-    setPaymentComplete(true);
-    let data = await getTicket(userData.token);
-    setTicket(data);
+    if(!ticket.isRemote && ticket.includesHotel) return 'Presencial + Com Hotel';
+   
+    if(!ticket.isRemote && !ticket.includesHotel) return 'Presencial sem hotel';
   }
 
   return (
@@ -60,57 +49,7 @@ export default function Payment() {
       </MainTitle>
       
       {!paymentComplete ? (
-        <div>
-          <SecondaryTitle>
-            <h2>Primeiro, escolha sua modalidade de ingresso</h2>
-          </SecondaryTitle>
-          <TicketsContainer>
-
-            {tickets.length === 3?
-              <>
-                <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected} 
-                  ticketInfo={tickets.filter((e) => !e.isRemote && !e.includesHotel)[0]} key={1} 
-                  aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
-
-                <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected} 
-                  ticketInfo={tickets.filter((e) => e.isRemote)[0]} price={100} key={2} 
-                  aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
-              </>
-              : null}
-
-          </TicketsContainer>
-          <SecondInnerContainer visible={presentialSelected}>
-            <SecondaryTitle>
-              <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
-            </SecondaryTitle>
-            <TicketsContainer>
-
-              {tickets.length === 3?
-                <>
-                  <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected} 
-                    ticketInfo={{ price: 0, name: 'Sem Hotel' }} key={3} 
-                    aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
-
-                  <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
-                    ticketInfo={tickets.filter((e) => !e.isRemote && e.includesHotel)[0]} key={4} 
-                    aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
-
-                </>
-                : null}
-
-            </TicketsContainer>
-          </SecondInnerContainer>
-          <ThirdInnerContainer visible={remoteSelected || hotelSelected || noHotelSelected}>
-            <SecondaryTitle>
-              <h2>
-                Fechado! O total ficou em <strong>R$ {baseValue + aditionalValue}</strong>. Agora é só confirmar:
-              </h2>
-            </SecondaryTitle>
-            <ConfirmTicketButton onClick={reservTicket}>
-              <h1>RESERVAR INGRESSO</h1>
-            </ConfirmTicketButton>
-          </ThirdInnerContainer>
-        </div>
+        <TicketTypeSection completeReservation={setPaymentComplete} chooseTicket={setTicket}/>
       ) : (
         <div>
           <PaymentSummary>
