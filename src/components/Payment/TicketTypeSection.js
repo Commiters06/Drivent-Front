@@ -3,13 +3,17 @@ import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import UserContext from '../../contexts/UserContext';
+import { getTicket, postTicket } from '../../services/ticketApi';
+import { getPersonalInformations } from '../../services/enrollmentApi';
 import { getTicket, getTicketTypes, postTicket } from '../../services/ticketApi';
 import TicketContext from '../../contexts/Ticket';
 
+
 export default function TicketTypeSection({ completeReservation, chooseTicket }) {
   const [tickets, setTickets] = useState([]);
-  const [baseValue, setBaseValue] = useState (0);
-  const [aditionalValue, setAdiotionalValue] = useState (0);
+  const [unavailable, setUnavailable] = useState(true);
+  const [baseValue, setBaseValue] = useState(0);
+  const [aditionalValue, setAdiotionalValue] = useState(0);
 
   const [presentialSelected, setPresentialSelected] = useState(false);
   const [remoteSelected, setRemoteSelected] = useState(false);
@@ -23,6 +27,7 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
 
   useEffect(async() => {
     let token = userData.token;
+
     try {
       const Tickets = await getTicketTypes(token);
       setTickets(Tickets);
@@ -39,59 +44,76 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
     completeReservation(true);
   }
 
-  return(
+  async function enrollmentInfo() {
+    let enrollment = await getPersonalInformations(userData.token);
+    if(enrollment) {
+      setUnavailable(false);
+    } else {
+      setUnavailable(true);
+    }
+  }
+
+  return (
     <div>
-      <SecondaryTitle>
-        <h2>Primeiro, escolha sua modalidade de ingresso</h2>
-      </SecondaryTitle>
-      <TicketsContainer>
-        {tickets.length === 3?
-          <>
-            <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected} 
-              ticketInfo={tickets.filter((e) => !e.isRemote && !e.includesHotel)[0]} key={1} chooseFinal={setFinalSelection}
-              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
+      {unavailable?
+        <UnavailableTicketsContainer>
+          <div>
+            <h3>Você precisa completar sua inscrição antes</h3>
+            <h3>de prosseguir pra escolha de ingresso</h3>
+          </div>
+        </UnavailableTicketsContainer>
+        :
+        <>
+          <SecondaryTitle>
+            <h2>Primeiro, escolha sua modalidade de ingresso</h2>
+          </SecondaryTitle>
+          <TicketsContainer>
+            {tickets.length === 3 ?
+              <>
+                <TicketTypeBox selected={presentialSelected} selectedFunction={setPresentialSelected} exchangeSelected={setRemoteSelected}
+                  ticketInfo={tickets.filter((e) => !e.isRemote && !e.includesHotel)[0]} key={1} chooseFinal={setFinalSelection}
+                  aditional={false} finalPriceChange={setBaseValue} parentalDependency={true} />
 
-            <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected} 
-              ticketInfo={tickets.filter((e) => e.isRemote)[0]} key={2} chooseFinal={setFinalSelection}
-              aditional={false} finalPriceChange={setBaseValue} parentalDependency={true}/>
-          </>
-          : null}
+                <TicketTypeBox selected={remoteSelected} selectedFunction={setRemoteSelected} exchangeSelected={setPresentialSelected}
+                  ticketInfo={tickets.filter((e) => e.isRemote)[0]} key={2} chooseFinal={setFinalSelection}
+                  aditional={false} finalPriceChange={setBaseValue} parentalDependency={true} />
+              </>
+              : null}
 
-      </TicketsContainer>
-      <SecondInnerContainer visible={presentialSelected}>
-        <SecondaryTitle>
-          <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
-        </SecondaryTitle>
-        <TicketsContainer>
+          </TicketsContainer>
+          <SecondInnerContainer visible={presentialSelected}>
+            <SecondaryTitle>
+              <h2>Ótimo! Agora escolha sua modalidade de hospedagem</h2>
+            </SecondaryTitle>
+            <TicketsContainer>
 
-          {tickets.length === 3?
-            <>
-              <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected} 
-                ticketInfo={{ id: tickets.filter((e) => !e.isRemote && !e.includesHotel)[0].id, price: 0, name: 'Sem Hotel' }} key={3} chooseFinal={setFinalSelection}
-                aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+              {tickets.length === 3 ?
+                <>
+                  <TicketTypeBox selected={hotelSelected} selectedFunction={setHotelSelected} exchangeSelected={setNoHotelSelected}
+                    ticketInfo={{ id: tickets.filter((e) => !e.isRemote && !e.includesHotel)[0].id, price: 0, name: 'Sem Hotel' }} key={3} chooseFinal={setFinalSelection}
+                    aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected} />
 
-              <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
-                ticketInfo={{ id: tickets.filter((e) => !e.isRemote && e.includesHotel)[0].id, 
-                  price: tickets.filter((e) => !e.isRemote && e.includesHotel)[0].price - tickets.filter((e) => !e.isRemote && !e.includesHotel)[0].price,
-                  name: tickets.filter((e) => !e.isRemote && e.includesHotel)[0].name }} 
-                key={4} chooseFinal={setFinalSelection}
-                aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
+                  <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected}
+                    ticketInfo={tickets.filter((e) => !e.isRemote && e.includesHotel)[0]} key={4} chooseFinal={setFinalSelection}
+                    aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected} />
 
-            </>
-            : null}
+                </>
+                : null}
 
-        </TicketsContainer>
-      </SecondInnerContainer>
-      <ThirdInnerContainer visible={remoteSelected || hotelSelected || noHotelSelected}>
-        <SecondaryTitle>
-          <h2>
-            Fechado! O total ficou em <strong>R$ {baseValue + aditionalValue}</strong>. Agora é só confirmar:
-          </h2>
-        </SecondaryTitle>
-        <ConfirmTicketButton onClick={() => reservTicket() }>
-          <h1>RESERVAR INGRESSO</h1>
-        </ConfirmTicketButton>
-      </ThirdInnerContainer>
+            </TicketsContainer>
+          </SecondInnerContainer>
+          <ThirdInnerContainer visible={remoteSelected || hotelSelected || noHotelSelected}>
+            <SecondaryTitle>
+              <h2>
+                Fechado! O total ficou em <strong>R$ {baseValue + aditionalValue}</strong>. Agora é só confirmar:
+              </h2>
+            </SecondaryTitle>
+            <ConfirmTicketButton onClick={reservTicket}>
+              <h1>RESERVAR INGRESSO</h1>
+            </ConfirmTicketButton>
+          </ThirdInnerContainer>
+        </>
+      }
     </div>
   );
 };
@@ -116,6 +138,30 @@ const SecondaryTitle = styled.div`
   }
   margin-bottom: 17px;
 `;
+
+const UnavailableTicketsContainer = styled.div`
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  div {
+    height: 46px;
+    width: 399px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  h3 {
+    font-family: 'Roboto';
+    font-size: 20px;
+    font-weight: 400;
+    color: #8E8E8E;
+  }
+`;
+
 const TicketsContainer = styled.div`
   display: flex;
   column-gap: 24px;
