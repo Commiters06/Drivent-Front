@@ -5,12 +5,13 @@ import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
 import TicketTypeSection from '../../../components/Payment/TicketTypeSection';
 import DataPayment from '../../../components/Payment/DataPayment';
+import TicketContext from '../../../contexts/Ticket';
 
 export default function Payment() {
   const [paymentComplete, setPaymentComplete] = useState(false);
-  const [ticket, setTicket] = useState(null);
 
   const { userData } = useContext(UserContext);
+  const { setTicket } = useContext(TicketContext);
 
   useEffect(() => {
     let URL = process.env.REACT_APP_API_BASE_URL;
@@ -41,7 +42,7 @@ export default function Payment() {
       {!paymentComplete ? (
         <TicketTypeSection completeReservation={setPaymentComplete} chooseTicket={setTicket}/>
       ) : (
-        <DataPayment ticket={ticket}/>
+        <DataPayment />
       )}
     </PageContainer>
   );

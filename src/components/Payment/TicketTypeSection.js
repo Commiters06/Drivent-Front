@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import UserContext from '../../contexts/UserContext';
 import { getTicket, postTicket } from '../../services/ticketApi';
+import TicketContext from '../../contexts/Ticket';
 
 export default function TicketTypeSection({ completeReservation, chooseTicket }) {
   const [tickets, setTickets] = useState([]);
@@ -18,6 +19,7 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
   const [finalSelection, setFinalSelection] = useState(0);
 
   const { userData } = useContext(UserContext);
+  const { setTicket } = useContext(TicketContext);
 
   useEffect(() => {
     let URL = process.env.REACT_APP_API_BASE_URL;
@@ -43,6 +45,7 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
       ticketTypeId: finalSelection
     };
     let data = await postTicket(userData.token, body);
+    setTicket(data);
     chooseTicket(data);
     completeReservation(true);
   }
@@ -96,7 +99,7 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
             Fechado! O total ficou em <strong>R$ {baseValue + aditionalValue}</strong>. Agora é só confirmar:
           </h2>
         </SecondaryTitle>
-        <ConfirmTicketButton onClick={reservTicket}>
+        <ConfirmTicketButton onClick={() => reservTicket() }>
           <h1>RESERVAR INGRESSO</h1>
         </ConfirmTicketButton>
       </ThirdInnerContainer>

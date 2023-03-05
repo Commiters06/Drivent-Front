@@ -1,7 +1,13 @@
+import { useContext } from 'react';
 import styled from 'styled-components';
 import HotelDisplay from '../../../components/Hotel/HotelsDisplay';
+import TicketContext from '../../../contexts/Ticket';
 
 export default function Hotel() {
+  const { ticketData, setTicket } = useContext(TicketContext);
+
+  console.log(ticketData);
+
   return (
     <PageContainer>
       <MainTitle>

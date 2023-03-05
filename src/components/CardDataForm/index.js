@@ -14,10 +14,13 @@ import 'react-credit-cards-2/es/styles-compiled.css';
 import api from '../../services/api';
 import cardValidator from 'card-validator';
 import UserContext from '../../contexts/UserContext';
+import TicketContext from '../../contexts/Ticket';
 
 dayjs.extend(CustomParseFormat);
 
 export default function CardDataForm({ ticketId }) {
+  const { ticketData, setTicket } = useContext(TicketContext);
+
   const [cardData, setCardData] = useState({
     number: '',
     expiry: '',
@@ -54,6 +57,7 @@ export default function CardDataForm({ ticketId }) {
         setLoading(true);
         await api.post('/payments/process', newData, config);
         setLoading(false);
+        setTicket({ ...ticketData, status: 'PAID' });
         toast('Informações salvas com sucesso!');
       } catch (err) {
         toast('Não foi possível salvar suas informações!');
