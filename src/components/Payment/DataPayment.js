@@ -1,23 +1,27 @@
 import styled from 'styled-components';
 import 'react-credit-cards-2/es/styles-compiled.css';
 import CardDataForm from '../CardDataForm';
+import TicketContext from '../../contexts/Ticket';
+import { useContext } from 'react';
 
-export default function DataPayment({ ticket }) {
+export default function DataPayment() {
+  const { ticketData } = useContext(TicketContext);
+
   function summaryText() {
-    if (ticket.TicketType.isRemote) return 'Online';
+    if (ticketData.TicketType.isRemote) return 'Online';
 
-    if (!ticket.TicketType.isRemote && ticket.TicketType.includesHotel) return 'Presencial + Com Hotel';
+    if (!ticketData.TicketType.isRemote && ticketData.TicketType.includesHotel) return 'Presencial + Com Hotel';
 
-    if (!ticket.TicketType.isRemote && !ticket.TicketType.includesHotel) return 'Presencial sem hotel';
+    if (!ticketData.TicketType.isRemote && !ticketData.TicketType.includesHotel) return 'Presencial sem hotel';
   }
 
   return (
     <div>
       <PaymentSummary>
         <h1>{summaryText()}</h1>
-        <p>{ticket?.TicketType.price ? `R$ ${ticket.TicketType.price}` : 'Erro! ticket não encontrado.'}</p>
+        <p>{ticketData?.TicketType.price ? `R$ ${ticketData.TicketType.price}` : 'Erro! ticket não encontrado.'}</p>
       </PaymentSummary>
-      <CardDataForm ticketId={ticket.id}/>
+      <CardDataForm ticketId={ticketData.id}/>
     </div>
   );
 }
