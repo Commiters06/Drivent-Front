@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import UserContext from '../../contexts/UserContext';
+import { getHotelRooms } from '../../services/hotelsApi';
 
 export default function Hotelicon({ hotelInfo,  isSelected, selectOther }) {
   const [rooms, setRooms] = useState();
@@ -15,24 +16,15 @@ export default function Hotelicon({ hotelInfo,  isSelected, selectOther }) {
 
   const { userData } = useContext(UserContext);
 
-  useEffect(() => {
-    let URL = process.env.REACT_APP_API_BASE_URL;
+  useEffect(async() => {
     let token = userData.token;
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    let promise = axios.get(`${URL}/hotels/${hotelInfo.id}`, config);
-    promise.then((res) => {
-      setRooms(res.data.Rooms);
-      console.log(res.data);
-      determineOccupations(res.data.Rooms);
-      detemineAccomodationTypes(res.data.Rooms);
-    });
-    promise.catch((err) => {
-      console.log(err);
-    });
+
+    try {
+      const hotels = await getHotelRooms(token, hotelInfo.id);
+      setRooms(hotels.Rooms);
+      determineOccupations(hotels.Rooms);
+      detemineAccomodationTypes(hotels.Rooms);
+    }catch(err) {}
   }, []);
 
   function determineOccupations(rooms) {

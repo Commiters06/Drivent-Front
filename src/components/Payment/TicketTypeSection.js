@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import UserContext from '../../contexts/UserContext';
-import { getTicket, postTicket } from '../../services/ticketApi';
+import { getTicket, getTicketTypes, postTicket } from '../../services/ticketApi';
 import TicketContext from '../../contexts/Ticket';
 
 export default function TicketTypeSection({ completeReservation, chooseTicket }) {
@@ -21,23 +21,12 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
   const { userData } = useContext(UserContext);
   const { setTicket } = useContext(TicketContext);
 
-  useEffect(() => {
-    let URL = process.env.REACT_APP_API_BASE_URL;
+  useEffect(async() => {
     let token = userData.token;
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    let promise = axios.get(`${URL}/tickets/types`, config);
-    promise.then((res) => {
-      const newArr = res.data;
-      setTickets(newArr);
-    });
-    promise.catch((err) => {
-      console.log(err);
-      console.log(config);
-    });
+    try {
+      const Tickets = await getTicketTypes(token);
+      setTickets(Tickets);
+    }catch(err) {}
   }, []);
 
   async function reservTicket() {

@@ -6,7 +6,7 @@ const TicketContext = createContext();
 export default TicketContext;
 
 export function TicketProvider({ children }) {
-  const [ticketData, setTicket] = useLocalStorage('ticketData', {});
+  const [ticketData, setTicket] = useLocalStorage('ticketData', null);
   
   return (
     <TicketContext.Provider value={{ ticketData, setTicket }}>
