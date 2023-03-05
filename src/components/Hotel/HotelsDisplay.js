@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import UserContext from '../../contexts/UserContext';
 import Hotel from '../../pages/Dashboard/Hotel';
+import { getHotels } from '../../services/hotelsApi';
 import Hotelicon from './Hotelicon';
 
 export default function HotelDisplay({}) {
@@ -14,22 +15,13 @@ export default function HotelDisplay({}) {
 
   const { userData } = useContext(UserContext);
 
-  useEffect(() => {
-    let URL = process.env.REACT_APP_API_BASE_URL;
+  useEffect(async() => {
     let token = userData.token;
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    let promise = axios.get(`${URL}/hotels/`, config);
-    promise.then((res) => {
-      setHotels(res.data);
-      console.log(res.data);
-    });
-    promise.catch((err) => {
-      console.log(err);
-    });
+
+    try {
+      const hotels = await getHotels(token);
+      setHotels(hotels);
+    }catch(err) {}
   }, []);
 
   return(

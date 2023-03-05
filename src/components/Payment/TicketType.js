@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 
 export default function TicketTypeBox({ selected, selectedFunction, exchangeSelected, ticketInfo, aditional, finalPriceChange, parentalDependency, chooseFinal }) {
-  console.log(ticketInfo);
-
   if(!parentalDependency) {
     finalPriceChange(0);
     selectedFunction(false);

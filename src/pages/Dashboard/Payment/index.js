@@ -5,31 +5,24 @@ import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
 import TicketTypeSection from '../../../components/Payment/TicketTypeSection';
 import DataPayment from '../../../components/Payment/DataPayment';
+import TicketContext from '../../../contexts/Ticket';
+import { getTicket } from '../../../services/ticketApi';
 
 export default function Payment() {
   const [paymentComplete, setPaymentComplete] = useState(false);
-  const [ticket, setTicket] = useState(null);
 
   const { userData } = useContext(UserContext);
+  const { ticketData, setTicket } = useContext(TicketContext);
 
-  useEffect(() => {
-    let URL = process.env.REACT_APP_API_BASE_URL;
+  useEffect(async() => {
     let token = userData.token;
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    let promise = axios.get(`${URL}/tickets/`, config);
-    promise.then((res) => {
-      const myTicket = res.data;
+    try {
+      const myTicket = await getTicket(token);
       setTicket(myTicket);
       setPaymentComplete(true);
-    });
-    promise.catch((err) => {
-      console.log(err);
-      console.log(config);
-    });
+    }catch(err) {
+      setTicket(null);
+    }
   }, []);
 
   return (
@@ -41,7 +34,7 @@ export default function Payment() {
       {!paymentComplete ? (
         <TicketTypeSection completeReservation={setPaymentComplete} chooseTicket={setTicket}/>
       ) : (
-        <DataPayment ticket={ticket}/>
+        <DataPayment />
       )}
     </PageContainer>
   );
