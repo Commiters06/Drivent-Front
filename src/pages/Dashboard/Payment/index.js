@@ -37,11 +37,26 @@ export default function Payment() {
       <MainTitle>
         <h1>Ingresso e pagamento</h1>
       </MainTitle>
-      
+
       {!paymentComplete ? (
-        <TicketTypeSection completeReservation={setPaymentComplete} chooseTicket={setTicket}/>
+        <TicketTypeSection completeReservation={setPaymentComplete} chooseTicket={setTicket} />
       ) : (
-        <DataPayment ticket={ticket}/>
+        <>
+          <DataPayment ticket={ticket} />
+          <ConfirmPaymentContainer>
+            <h2>Pagamento</h2>
+            <ConfirmPayment>
+              <Checkmark>
+                <ion-icon name="checkmark-circle"></ion-icon>
+              </Checkmark>
+              <ConfirmText>
+                <h3>Pagamento confirmado!</h3>
+                <h4>Prossiga para a escolha de hospedagem e atividades</h4>
+              </ConfirmText>
+            </ConfirmPayment>
+          </ConfirmPaymentContainer>
+        </>
+
       )}
     </PageContainer>
   );
@@ -62,4 +77,47 @@ const MainTitle = styled.div`
     color: #000000;
   }
   margin-bottom: 37px;
+`;
+
+const ConfirmPaymentContainer = styled.div`
+  h2 {
+    font-family: 'Roboto';
+    font-size: 20px;
+    color: #8E8E8E;
+    margin-bottom: 17px;
+  }
+`;
+
+const ConfirmPayment = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const Checkmark = styled.div`
+  width: 40px;
+  margin-right: 14px;
+
+  ion-icon {
+    color: #36B853;
+    height: 40px;
+    width: 40px;
+  }
+`;
+
+const ConfirmText = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 40px;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  h4 {
+    font-size: 16px;
+    font-weight: 400;
+    color: #454545;
+  }
 `;
