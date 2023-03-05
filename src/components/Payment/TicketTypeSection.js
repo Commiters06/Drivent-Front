@@ -79,7 +79,10 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
                 aditional={true} finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
 
               <TicketTypeBox selected={noHotelSelected} selectedFunction={setNoHotelSelected} exchangeSelected={setHotelSelected} 
-                ticketInfo={tickets.filter((e) => !e.isRemote && e.includesHotel)[0]} key={4} chooseFinal={setFinalSelection}
+                ticketInfo={{ id: tickets.filter((e) => !e.isRemote && e.includesHotel)[0].id, 
+                  price: tickets.filter((e) => !e.isRemote && e.includesHotel)[0].price - tickets.filter((e) => !e.isRemote && !e.includesHotel)[0].price,
+                  name: tickets.filter((e) => !e.isRemote && e.includesHotel)[0].name }} 
+                key={4} chooseFinal={setFinalSelection}
                 aditional={true}  finalPriceChange={setAdiotionalValue} parentalDependency={presentialSelected}/>
 
             </>
