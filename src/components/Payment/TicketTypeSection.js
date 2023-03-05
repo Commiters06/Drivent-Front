@@ -4,9 +4,11 @@ import styled from 'styled-components';
 import axios from 'axios';
 import UserContext from '../../contexts/UserContext';
 import { getTicket, postTicket } from '../../services/ticketApi';
+import { getPersonalInformations } from '../../services/enrollmentApi';
 
 export default function TicketTypeSection({ completeReservation, chooseTicket }) {
   const [tickets, setTickets] = useState([]);
+  const [unavailable, setUnavailable] = useState(true);
   const [baseValue, setBaseValue] = useState(0);
   const [aditionalValue, setAdiotionalValue] = useState(0);
 
@@ -31,6 +33,7 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
     promise.then((res) => {
       const newArr = res.data;
       setTickets(newArr);
+      enrollmentInfo();
     });
     promise.catch((err) => {
       console.log(err);
@@ -47,9 +50,18 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
     completeReservation(true);
   }
 
+  async function enrollmentInfo() {
+    let enrollment = await getPersonalInformations(userData.token);
+    if(enrollment) {
+      setUnavailable(false);
+    } else {
+      setUnavailable(true);
+    }
+  }
+
   return (
     <div>
-      {tickets.length === 0 ?
+      {unavailable?
         <UnavailableTicketsContainer>
           <div>
             <h3>Você precisa completar sua inscrição antes</h3>
