@@ -56,14 +56,6 @@ export default function HotelDisplay({}) {
 const HotelPage = styled.div`
     div{
         display: flex;
-
-        .on{
-            background-color: '#FFEED2';
-        }
-
-        .off{
-            background-color: '#FFFFFF';
-        }
     }
 `;
 
