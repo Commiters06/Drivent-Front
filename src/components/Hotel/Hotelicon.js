@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect } from 'react';
 import { useContext } from 'react';
 import { useState } from 'react';
@@ -47,8 +46,8 @@ export default function Hotelicon({ hotelInfo,  isSelected, selectOther }) {
     };
   }
   return(
-    <HotelBox onClick={!(isSelected == hotelInfo.id)? () => selectOther(hotelInfo.id): () => selectOther(0)} selected={isSelected == hotelInfo.id}>
-      <img src={hotelInfo.image}/>
+    <HotelBox onClick={!(isSelected === hotelInfo.id)? () => selectOther(hotelInfo.id): () => selectOther(0)} selected={isSelected === hotelInfo.id}>
+      <img src={hotelInfo.image} alt='Hotel'/>
       <h3>{hotelInfo.name}</h3>
       <h4>Tipos de acomodação:</h4>
       <p>

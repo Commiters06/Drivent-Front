@@ -18,7 +18,7 @@ import TicketContext from '../../contexts/Ticket';
 
 dayjs.extend(CustomParseFormat);
 
-export default function CardDataForm({ ticketId }) {
+export default function CardDataForm({ ticketId, isPaid }) {
   const { ticketData, setTicket } = useContext(TicketContext);
 
   const [cardData, setCardData] = useState({
@@ -58,6 +58,7 @@ export default function CardDataForm({ ticketId }) {
         await api.post('/payments/process', newData, config);
         setLoading(false);
         setTicket({ ...ticketData, status: 'PAID' });
+        isPaid(true);
         toast('Informações salvas com sucesso!');
       } catch (err) {
         toast('Não foi possível salvar suas informações!');
