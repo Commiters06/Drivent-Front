@@ -1,14 +1,12 @@
-import axios from 'axios';
 import { useContext } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import UserContext from '../../contexts/UserContext';
-import Hotel from '../../pages/Dashboard/Hotel';
 import { getHotels } from '../../services/hotelsApi';
 import Hotelicon from './Hotelicon';
 
-export default function HotelDisplay({}) {
+export default function HotelDisplay() {
   const [hotels, setHotels] = useState(null);
   const [rooms, setRooms] = useState(null);
   const [hotelSelected, setHotelSelected] = useState(0);

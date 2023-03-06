@@ -1,22 +1,25 @@
 /* eslint-disable no-console */
 import styled from 'styled-components';
-import axios from 'axios';
 import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
 import TicketTypeSection from '../../../components/Payment/TicketTypeSection';
 import DataPayment from '../../../components/Payment/DataPayment';
 import TicketContext from '../../../contexts/Ticket';
 import { getTicket } from '../../../services/ticketApi';
+import { getPersonalInformations } from '../../../services/enrollmentApi';
 
 export default function Payment() {
   const [paymentComplete, setPaymentComplete] = useState(false);
+  const [enrollment, setEnrollment] = useState(null);
 
   const { userData } = useContext(UserContext);
-  const { ticketData, setTicket } = useContext(TicketContext);
+  const { setTicket } = useContext(TicketContext);
 
   useEffect(async() => {
     let token = userData.token;
     try {
+      const enrollmentExist = await getPersonalInformations(userData.token);
+      setEnrollment(enrollmentExist);
       const myTicket = await getTicket(token);
       setTicket(myTicket);
       setPaymentComplete(true);
@@ -24,6 +27,24 @@ export default function Payment() {
       setTicket(null);
     }
   }, []);
+
+  if(enrollment === null) {
+    return (
+      <PageContainer>
+        <MainTitle>
+          <h1>Ingresso e pagamento</h1>
+        </MainTitle>
+
+        <UnavailableTicketsContainer>
+          <div>
+            <h3>Você precisa completar sua inscrição antes</h3>
+            <h3>de prosseguir pra escolha de ingresso</h3>
+          </div>
+        </UnavailableTicketsContainer>
+
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -34,21 +55,7 @@ export default function Payment() {
       {!paymentComplete ? (
         <TicketTypeSection completeReservation={setPaymentComplete} chooseTicket={setTicket} />
       ) : (
-        <>
-          <DataPayment />
-          <ConfirmPaymentContainer>
-            <h2>Pagamento</h2>
-            <ConfirmPayment>
-              <Checkmark>
-                <ion-icon name="checkmark-circle"></ion-icon>
-              </Checkmark>
-              <ConfirmText>
-                <h3>Pagamento confirmado!</h3>
-                <h4>Prossiga para a escolha de hospedagem e atividades</h4>
-              </ConfirmText>
-            </ConfirmPayment>
-          </ConfirmPaymentContainer>
-        </>
+        <DataPayment />
       )}
     </PageContainer>
   );
@@ -71,45 +78,25 @@ const MainTitle = styled.div`
   margin-bottom: 37px;
 `;
 
-const ConfirmPaymentContainer = styled.div`
-  h2 {
-    font-family: 'Roboto';
-    font-size: 20px;
-    color: #8E8E8E;
-    margin-bottom: 17px;
-  }
-`;
-
-const ConfirmPayment = styled.div`
+const UnavailableTicketsContainer = styled.div`
+  height: 500px;
   display: flex;
-  flex-direction: row;
-`;
-
-const Checkmark = styled.div`
-  width: 40px;
-  margin-right: 14px;
-
-  ion-icon {
-    color: #36B853;
-    height: 40px;
-    width: 40px;
-  }
-`;
-
-const ConfirmText = styled.div`
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  height: 40px;
+
+  div {
+    height: 46px;
+    width: 399px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 
   h3 {
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  h4 {
-    font-size: 16px;
+    font-family: 'Roboto';
+    font-size: 20px;
     font-weight: 400;
-    color: #454545;
+    color: #8E8E8E;
   }
 `;

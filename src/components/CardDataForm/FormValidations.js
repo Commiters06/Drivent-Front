@@ -46,7 +46,6 @@ function isNumberValid(value) {
 
 function isExpiryValid(value) {
   const result = cardValidator.expirationDate(value);
-  console.log(result);
   if(result.isValid) {
     return value;
   }
