@@ -2,9 +2,12 @@ import styled from 'styled-components';
 import { BsPersonFill } from 'react-icons/bs';
 import { BsPerson } from 'react-icons/bs';
 import { useEffect, useState } from 'react';
+import { tr } from 'date-fns/locale';
 
-export default function RoomIcon({ roomInfo }) {
+export default function RoomIcon({ roomInfo, chooseRoom, roomSelected }) {
   const [spaces, setSpaces] = useState([]);
+  const [full, setFull] = useState(false);
+  const [chosenSpace, setChosenSpace] = useState(0);
 
   useEffect(() => {
     const spacesRegistration = [];
@@ -17,28 +20,39 @@ export default function RoomIcon({ roomInfo }) {
       spacesRegistration.push(newObject);
     };
 
+    if(roomInfo.capacity === roomInfo.Booking.length) {
+      setFull(true);
+    }
+
     setSpaces([...spacesRegistration]);
-  }, [roomInfo]);
+  }, [roomInfo, roomSelected]);
 
   return(
-    <RoomBox>
+    <RoomBox full={full} selected={(roomSelected === roomInfo.id)}>
       <h3>{ roomInfo.name }</h3>
       <section>
         {spaces?
-          spaces.map((e) =>  <SpaceIcon spaceInfo={e}/>)
+          spaces.map((e) =>  <SpaceIcon spaceInfo={e} full={full} chooseRoom={chooseRoom} roomId={roomInfo.id} available={(roomSelected === roomInfo.id)}
+            chosenSpace={chosenSpace} setChosenSpace={setChosenSpace}/>)
           : null}
       </section>
-      
     </RoomBox>
   );
 }
 
-function SpaceIcon({ spaceInfo }) {
+function SpaceIcon({ spaceInfo, full, chooseRoom, roomId, available, chosenSpace, setChosenSpace }) {
   console.log(spaceInfo);
 
+  function reservRoom() {
+    chooseRoom(roomId);
+    setChosenSpace(spaceInfo.spaceId);
+  }
+
   return(
-    <ReservRoomButton disabled ={spaceInfo.bookingId}>
-      {spaceInfo.bookingId ? 
+    <ReservRoomButton disabled ={!(spaceInfo.bookingId === undefined)} onClick={() => reservRoom()} full={full} 
+      selected={(available && (chosenSpace === spaceInfo.spaceId))}>
+
+      {spaceInfo.bookingId ||(available && (chosenSpace === spaceInfo.spaceId)) ? 
         <BsPersonFill/>
         :<BsPerson/>
       }
@@ -55,10 +69,18 @@ const RoomBox = styled.div`
     width: 180px;
     height: 45px;
     border: 1px solid #CECECE;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    background-color: ${props => props.full ? '#E9E9E9': props.selected? '#FFEED2' :'#FFFFFF' };
+
+    h3{
+        font-family: 'Roboto';
+        font-size: 20px;
+        font-weight: 700;
+        color: ${props => props.full ? ' #9D9D9D': '#454545' };
+    }
 
     section{
         display: flex;
@@ -72,7 +94,7 @@ const ReservRoomButton = styled.button`
     cursor: pointer;
     padding: 0px;
 
-    color: #000000;
+    color: ${props => props.full ? ' #8C8C8C': props.selected ? '#FF4791':  '#000000'};
     font-size: 22px;
     
     display: flex;

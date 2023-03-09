@@ -11,6 +11,7 @@ export default function HotelDisplay() {
   const [hotels, setHotels] = useState(null);
   const [rooms, setRooms] = useState(null);
   const [hotelSelected, setHotelSelected] = useState(0);
+  const [roomSelected, setRoomSelected] = useState(0);
 
   const { userData } = useContext(UserContext);
 
@@ -41,7 +42,7 @@ export default function HotelDisplay() {
             <h2>Ótima pedida! Agora escolha seu quarto:</h2>
           </SecondaryTitle>
           <FlexDivs>
-            {rooms.map((r) => <RoomIcon roomInfo={r} showRooms={setRooms} />)}
+            {rooms.map((r) => <RoomIcon roomInfo={r} chooseRoom={setRoomSelected} roomSelected={roomSelected} />)}
           </FlexDivs>
         </>
         : null}
