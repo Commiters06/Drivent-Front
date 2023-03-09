@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import UserContext from '../../contexts/UserContext';
 import { getHotels } from '../../services/hotelsApi';
 import Hotelicon from './Hotelicon';
+import RoomIcon from './Roomicon';
 
 export default function HotelDisplay() {
   const [hotels, setHotels] = useState(null);
@@ -19,34 +20,48 @@ export default function HotelDisplay() {
     try {
       const hotels = await getHotels(token);
       setHotels(hotels);
-    }catch(err) {}
+    } catch (err) { }
   }, []);
 
-  return(
-    <HotelPage>
+  return (
+    <>
       <SecondaryTitle>
         <h2>Primeiro, escolha seu hotel</h2>
       </SecondaryTitle>
 
-      <div>
-        {hotels?
-          hotels.map((h) => <Hotelicon hotelInfo={h} isSelected={hotelSelected} selectOther= {setHotelSelected}/>)
-          :null}
-      </div>
+      <FlexDivsOverflow>
+        {hotels ?
+          hotels.map((h) => <Hotelicon hotelInfo={h} isSelected={hotelSelected} selectOther={setHotelSelected} showRooms={setRooms} />)
+          : null}
+      </FlexDivsOverflow>
 
-      <div>
-        {rooms?
-          hotels.map((h) => <Hotelicon hotelInfo={h} showRooms={setRooms}/>)
-          :null}
-      </div>
-    </HotelPage>
+      {rooms ?
+        <>
+          <SecondaryTitle>
+            <h2>Ótima pedida! Agora escolha seu quarto:</h2>
+          </SecondaryTitle>
+          <FlexDivs>
+            {rooms.map((r) => <RoomIcon roomInfo={r} showRooms={setRooms} />)}
+          </FlexDivs>
+        </>
+        : null}
+
+    </>
   );
 }
 
-const HotelPage = styled.div`
-    div{
-        display: flex;
-    }
+const FlexDivsOverflow = styled.div`
+  display: flex;
+  margin-bottom: 50px;
+  overflow-x: scroll;
+`;
+
+const FlexDivs = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  justify-content: flex-start;
+  margin-bottom: 50px;
 `;
 
 const SecondaryTitle = styled.div`

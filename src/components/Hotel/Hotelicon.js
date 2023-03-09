@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import UserContext from '../../contexts/UserContext';
 import { getHotelRooms } from '../../services/hotelsApi';
 
-export default function Hotelicon({ hotelInfo,  isSelected, selectOther }) {
+export default function Hotelicon({ hotelInfo,  isSelected, selectOther, showRooms }) {
   const [rooms, setRooms] = useState();
   const [spaces, setSpaces] = useState(0);
 
@@ -46,7 +46,7 @@ export default function Hotelicon({ hotelInfo,  isSelected, selectOther }) {
     };
   }
   return(
-    <HotelBox onClick={!(isSelected === hotelInfo.id)? () => selectOther(hotelInfo.id): () => selectOther(0)} selected={isSelected === hotelInfo.id}>
+    <HotelBox onClick={!(isSelected === hotelInfo.id)? () => {selectOther(hotelInfo.id); showRooms(rooms);}: () => {selectOther(0); showRooms(null);}} selected={isSelected === hotelInfo.id}>
       <img src={hotelInfo.image} alt='Hotel'/>
       <h3>{hotelInfo.name}</h3>
       <h4>Tipos de acomodação:</h4>
@@ -66,6 +66,7 @@ export default function Hotelicon({ hotelInfo,  isSelected, selectOther }) {
 const HotelBox = styled.button`
   height: 264px;
   width: 196px;
+  min-width: 196px;
   border-radius: 10px;
   padding: 16px 14px;
   border: none;
