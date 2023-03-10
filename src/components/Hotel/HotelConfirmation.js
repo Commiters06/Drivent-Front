@@ -10,7 +10,7 @@ export default function HotelConfirmation() {
   const { bookingData } = useContext(BookingContext);
   const { userData } = useContext(UserContext);
 
-  const [bookings, setBookings] = useState(null);
+  const [bookings, setBookings] = useState(0);
 
   useEffect(async() => {
     try{
