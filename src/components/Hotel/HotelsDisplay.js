@@ -2,7 +2,9 @@ import { useContext } from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import styled from 'styled-components';
+import BookingContext from '../../contexts/BookingContext';
 import UserContext from '../../contexts/UserContext';
+import { getMyBooking, postBooking } from '../../services/booking';
 import { getHotels } from '../../services/hotelsApi';
 import Hotelicon from './Hotelicon';
 import RoomIcon from './Roomicon';
@@ -14,6 +16,7 @@ export default function HotelDisplay() {
   const [roomSelected, setRoomSelected] = useState(0);
 
   const { userData } = useContext(UserContext);
+  const { setBooking } = useContext(BookingContext);
 
   useEffect(async() => {
     let token = userData.token;
@@ -23,6 +26,14 @@ export default function HotelDisplay() {
       setHotels(hotels);
     } catch (err) { }
   }, []);
+
+  async function reservRoom() {
+    try{
+      await postBooking(userData.token, roomSelected);
+      const myBooking = await getMyBooking(userData.token);
+      setBooking(myBooking);
+    }catch(err) { }
+  };
 
   return (
     <>
@@ -46,6 +57,14 @@ export default function HotelDisplay() {
           </FlexDivs>
         </>
         : null}
+
+      {roomSelected !== 0?
+        <ConfirmRoomButton onClick={() => reservRoom()}>
+          <h1>
+            RESERVAR QUARTO
+          </h1>
+        </ConfirmRoomButton>
+        :null}
 
     </>
   );
@@ -84,4 +103,25 @@ const SecondaryTitle = styled.div`
     text-align: left;
   }
   margin-bottom: 17px;
+`;
+
+const ConfirmRoomButton = styled.button`
+  height: 37px;
+  width: 162px;
+  border-radius: 4px;
+  background-color: #e0e0e0;
+  border: none;
+  box-shadow: 0px 2px 10px 0px #00000040;
+  cursor: pointer;
+  margin-bottom: 128px;
+
+  h1 {
+    font-family: 'Roboto';
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: #000000;
+  }
 `;

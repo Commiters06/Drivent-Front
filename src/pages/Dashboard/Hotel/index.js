@@ -1,10 +1,23 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import HotelConfirmation from '../../../components/Hotel/HotelConfirmation';
 import HotelDisplay from '../../../components/Hotel/HotelsDisplay';
-import TicketContext from '../../../contexts/Ticket';
+import BookingContext from '../../../contexts/BookingContext';
+import TicketContext from '../../../contexts/TicketContext';
+import UserContext from '../../../contexts/UserContext';
+import { getMyBooking } from '../../../services/booking';
 
 export default function Hotel() {
   const { ticketData } = useContext(TicketContext);
+  const { userData } = useContext(UserContext);
+  const { bookingData, setBooking } = useContext(BookingContext);
+
+  useEffect(async() => {
+    try{
+      const myBooking = await getMyBooking(userData.token);
+      setBooking(myBooking);
+    }catch(err) { }
+  }, []);
 
   if(ticketData === null || ticketData?.status !== 'PAID') {
     return (
@@ -50,9 +63,10 @@ export default function Hotel() {
         <MainTitle>
           <h1>Escolha de hotel e quarto</h1>
         </MainTitle>
-  
-        <HotelDisplay/>
-    
+        {bookingData === null?
+          <HotelDisplay/>
+          : <HotelConfirmation/>}
+        
       </PageContainer>
     );
   }  

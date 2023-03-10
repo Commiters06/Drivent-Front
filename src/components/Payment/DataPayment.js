@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import 'react-credit-cards-2/es/styles-compiled.css';
 import CardDataForm from '../CardDataForm';
-import TicketContext from '../../contexts/Ticket';
+import TicketContext from '../../contexts/TicketContext';
 import { useContext, useState } from 'react';
 
 export default function DataPayment() {

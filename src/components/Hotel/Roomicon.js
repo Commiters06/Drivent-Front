@@ -22,6 +22,8 @@ export default function RoomIcon({ roomInfo, chooseRoom, roomSelected }) {
 
     if(roomInfo.capacity === roomInfo.Booking.length) {
       setFull(true);
+    }else{
+      setFull(false);
     }
 
     setSpaces([...spacesRegistration]);
