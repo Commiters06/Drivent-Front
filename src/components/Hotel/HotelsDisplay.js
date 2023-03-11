@@ -4,19 +4,19 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import BookingContext from '../../contexts/BookingContext';
 import UserContext from '../../contexts/UserContext';
-import { getMyBooking, postBooking } from '../../services/booking';
-import { getHotels } from '../../services/hotelsApi';
+import { getMyBooking, postBooking, updateBooking } from '../../services/booking';
+import { getHotelRooms, getHotels } from '../../services/hotelsApi';
 import Hotelicon from './Hotelicon';
 import RoomIcon from './Roomicon';
 
-export default function HotelDisplay() {
+export default function HotelDisplay({ change }) {
   const [hotels, setHotels] = useState(null);
   const [rooms, setRooms] = useState(null);
   const [hotelSelected, setHotelSelected] = useState(0);
   const [roomSelected, setRoomSelected] = useState(0);
 
   const { userData } = useContext(UserContext);
-  const { setBooking } = useContext(BookingContext);
+  const { bookingData, setBooking } = useContext(BookingContext);
 
   useEffect(async() => {
     let token = userData.token;
@@ -24,12 +24,25 @@ export default function HotelDisplay() {
     try {
       const hotels = await getHotels(token);
       setHotels(hotels);
+
+      if(bookingData) {
+        const rooms = await getHotelRooms(token, bookingData.Room.Hotel.id);
+        setHotelSelected(bookingData.Room.Hotel.id);
+        setRoomSelected(bookingData.Room.id);
+        setRooms(rooms.Rooms);
+      }
     } catch (err) { }
   }, []);
 
   async function reservRoom() {
     try{
-      await postBooking(userData.token, roomSelected);
+      if(bookingData) {
+        await updateBooking(userData.token, bookingData.id, roomSelected);
+        change(false);
+      }else{
+        await postBooking(userData.token, roomSelected);
+      }
+      
       const myBooking = await getMyBooking(userData.token);
       setBooking(myBooking);
     }catch(err) { }
@@ -61,7 +74,8 @@ export default function HotelDisplay() {
       {roomSelected !== 0?
         <ConfirmRoomButton onClick={() => reservRoom()}>
           <h1>
-            RESERVAR QUARTO
+            {bookingData? 'CONFRIMAR TROCA':
+              'RESERVAR QUARTO'}
           </h1>
         </ConfirmRoomButton>
         :null}

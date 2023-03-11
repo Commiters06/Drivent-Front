@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import BookingContext from '../../contexts/BookingContext';
 import UserContext from '../../contexts/UserContext';
 import { getRoomBookings } from '../../services/booking';
-import HotelDisplayUpdate from './HotelDisplayUpdate';
-import Hotelicon from './Hotelicon';
 import HoteliconConfimation from './HoteliconConfirmation';
 import HotelDisplay from './HotelsDisplay';
 
@@ -24,7 +22,7 @@ export default function HotelConfirmation() {
 
   if(updateRoom) {
     return(
-      <HotelDisplayUpdate changeBack={setUpdateRoom}/>
+      <HotelDisplay change={setUpdateRoom}/>
     );
   }
 
