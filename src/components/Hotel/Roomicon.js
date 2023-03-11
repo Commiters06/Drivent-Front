@@ -28,7 +28,7 @@ export default function RoomIcon({ roomInfo, chooseRoom, roomSelected }) {
       setFull(false);
     }
 
-    if (bookingData.Room.id === roomInfo.id) {
+    if (bookingData?.Room.id === roomInfo.id) {
       setChosenSpace(1);
     }
 

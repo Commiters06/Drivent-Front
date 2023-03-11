@@ -20,7 +20,7 @@ export default function HotelConfirmation() {
       const bookings = await getRoomBookings(userData.token, bookingData.Room.id);
       setBookings(bookings);
     }catch(err) { }
-  }, []);
+  }, [bookingData]);
 
   if(updateRoom) {
     return(
