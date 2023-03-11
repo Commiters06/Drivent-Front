@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import UserContext from '../../contexts/UserContext';
 import { getTicketTypes, postTicket } from '../../services/ticketApi';
-import TicketContext from '../../contexts/Ticket';
+import TicketContext from '../../contexts/TicketContext';
 
 export default function TicketTypeSection({ completeReservation, chooseTicket }) {
   const [tickets, setTickets] = useState([]);

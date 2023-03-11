@@ -14,7 +14,7 @@ import 'react-credit-cards-2/es/styles-compiled.css';
 import api from '../../services/api';
 import cardValidator from 'card-validator';
 import UserContext from '../../contexts/UserContext';
-import TicketContext from '../../contexts/Ticket';
+import TicketContext from '../../contexts/TicketContext';
 
 dayjs.extend(CustomParseFormat);
 

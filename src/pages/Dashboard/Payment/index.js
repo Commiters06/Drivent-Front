@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import UserContext from '../../../contexts/UserContext';
 import TicketTypeSection from '../../../components/Payment/TicketTypeSection';
 import DataPayment from '../../../components/Payment/DataPayment';
-import TicketContext from '../../../contexts/Ticket';
+import TicketContext from '../../../contexts/TicketContext';
 import { getTicket } from '../../../services/ticketApi';
 import { getPersonalInformations } from '../../../services/enrollmentApi';
 
