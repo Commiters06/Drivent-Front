@@ -1,18 +1,20 @@
 import styled from 'styled-components';
 import { BsPersonFill } from 'react-icons/bs';
 import { BsPerson } from 'react-icons/bs';
-import { useEffect, useState } from 'react';
-import { tr } from 'date-fns/locale';
+import { useContext, useEffect, useState } from 'react';
+import BookingContext from '../../contexts/BookingContext';
 
 export default function RoomIcon({ roomInfo, chooseRoom, roomSelected }) {
   const [spaces, setSpaces] = useState([]);
   const [full, setFull] = useState(false);
   const [chosenSpace, setChosenSpace] = useState(0);
 
+  const { bookingData } = useContext(BookingContext);
+
   useEffect(() => {
     const spacesRegistration = [];
 
-    for(let i = 1; i <= roomInfo.capacity; i ++) {
+    for (let i = 1; i <= roomInfo.capacity; i++) {
       const newObject = {
         spaceId: i,
         bookingId: roomInfo.Booking[i - 1]?.id
@@ -20,22 +22,26 @@ export default function RoomIcon({ roomInfo, chooseRoom, roomSelected }) {
       spacesRegistration.push(newObject);
     };
 
-    if(roomInfo.capacity === roomInfo.Booking.length) {
+    if (roomInfo.capacity === roomInfo.Booking.length) {
       setFull(true);
-    }else{
+    } else {
       setFull(false);
+    }
+
+    if (bookingData.Room.id === roomInfo.id) {
+      setChosenSpace(1);
     }
 
     setSpaces([...spacesRegistration]);
   }, [roomInfo, roomSelected]);
 
-  return(
+  return (
     <RoomBox full={full} selected={(roomSelected === roomInfo.id)}>
-      <h3>{ roomInfo.name }</h3>
+      <h3>{roomInfo.name}</h3>
       <section>
-        {spaces?
-          spaces.map((e) =>  <SpaceIcon spaceInfo={e} full={full} chooseRoom={chooseRoom} roomId={roomInfo.id} available={(roomSelected === roomInfo.id)}
-            chosenSpace={chosenSpace} setChosenSpace={setChosenSpace}/>)
+        {spaces ?
+          spaces.map((e) => <SpaceIcon spaceInfo={e} full={full} chooseRoom={chooseRoom} roomId={roomInfo.id} available={(roomSelected === roomInfo.id)}
+            chosenSpace={chosenSpace} setChosenSpace={setChosenSpace} />)
           : null}
       </section>
     </RoomBox>
@@ -43,24 +49,20 @@ export default function RoomIcon({ roomInfo, chooseRoom, roomSelected }) {
 }
 
 function SpaceIcon({ spaceInfo, full, chooseRoom, roomId, available, chosenSpace, setChosenSpace }) {
-  console.log(spaceInfo);
-
   function reservRoom() {
     chooseRoom(roomId);
     setChosenSpace(spaceInfo.spaceId);
   }
 
-  return(
-    <ReservRoomButton disabled ={!(spaceInfo.bookingId === undefined)} onClick={() => reservRoom()} full={full} 
+  return (
+    <ReservRoomButton disabled={!(spaceInfo.bookingId === undefined)} onClick={() => reservRoom()} full={full}
       selected={(available && (chosenSpace === spaceInfo.spaceId))}>
 
-      {spaceInfo.bookingId ||(available && (chosenSpace === spaceInfo.spaceId)) ? 
-        <BsPersonFill/>
-        :<BsPerson/>
+      {spaceInfo.bookingId || (available && (chosenSpace === spaceInfo.spaceId)) ?
+        <BsPersonFill />
+        : <BsPerson />
       }
-
     </ReservRoomButton>
-
   );
 }
 
@@ -75,13 +77,13 @@ const RoomBox = styled.div`
     justify-content: space-between;
     align-items: center;
 
-    background-color: ${props => props.full ? '#E9E9E9': props.selected? '#FFEED2' :'#FFFFFF' };
+    background-color: ${props => props.full ? '#E9E9E9' : props.selected ? '#FFEED2' : '#FFFFFF'};
 
     h3{
         font-family: 'Roboto';
         font-size: 20px;
         font-weight: 700;
-        color: ${props => props.full ? ' #9D9D9D': '#454545' };
+        color: ${props => props.full ? ' #9D9D9D' : '#454545'};
     }
 
     section{
@@ -96,7 +98,7 @@ const ReservRoomButton = styled.button`
     cursor: pointer;
     padding: 0px;
 
-    color: ${props => props.full ? ' #8C8C8C': props.selected ? '#FF4791':  '#000000'};
+    color: ${props => props.selected ? '#FF4791' : props.full ? ' #8C8C8C' : '#000000'};
     font-size: 22px;
     
     display: flex;

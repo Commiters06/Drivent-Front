@@ -16,7 +16,9 @@ export default function Hotel() {
     try{
       const myBooking = await getMyBooking(userData.token);
       setBooking(myBooking);
-    }catch(err) { }
+    }catch(err) { 
+      setBooking(null);
+    }
   }, []);
 
   if(ticketData === null || ticketData?.status !== 'PAID') {

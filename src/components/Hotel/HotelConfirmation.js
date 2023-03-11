@@ -3,12 +3,15 @@ import styled from 'styled-components';
 import BookingContext from '../../contexts/BookingContext';
 import UserContext from '../../contexts/UserContext';
 import { getRoomBookings } from '../../services/booking';
+import HotelDisplayUpdate from './HotelDisplayUpdate';
 import Hotelicon from './Hotelicon';
 import HoteliconConfimation from './HoteliconConfirmation';
+import HotelDisplay from './HotelsDisplay';
 
 export default function HotelConfirmation() {
   const { bookingData } = useContext(BookingContext);
   const { userData } = useContext(UserContext);
+  const [updateRoom, setUpdateRoom] = useState(false);
 
   const [bookings, setBookings] = useState(0);
 
@@ -19,6 +22,12 @@ export default function HotelConfirmation() {
     }catch(err) { }
   }, []);
 
+  if(updateRoom) {
+    return(
+      <HotelDisplayUpdate changeBack={setUpdateRoom}/>
+    );
+  }
+
   return (
     <>
       <SecondaryTitle>
@@ -27,7 +36,7 @@ export default function HotelConfirmation() {
 
       <HoteliconConfimation hotelInfo={bookingData.Room.Hotel} roomInfo={bookingData.Room} usersInRoom={bookings}/>
 
-      <ConfirmRoomButton >
+      <ConfirmRoomButton onClick={() => setUpdateRoom(true)}>
         <h1>
           TROCAR QUARTO
         </h1>
