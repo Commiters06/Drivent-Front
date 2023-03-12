@@ -3,11 +3,9 @@ import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import UserContext from '../../contexts/UserContext';
-import { getTicket, postTicket } from '../../services/ticketApi';
 import { getPersonalInformations } from '../../services/enrollmentApi';
 import { getTicket, getTicketTypes, postTicket } from '../../services/ticketApi';
 import TicketContext from '../../contexts/Ticket';
-
 
 export default function TicketTypeSection({ completeReservation, chooseTicket }) {
   const [tickets, setTickets] = useState([]);
