@@ -56,6 +56,8 @@ export default function Payment() {
 
 const PageContainer = styled.div`
   background-color: white;
+  width: 100%;
+  height: 80%;
 `;
 
 const MainTitle = styled.div`

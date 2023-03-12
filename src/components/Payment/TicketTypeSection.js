@@ -29,6 +29,7 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
     try {
       const Tickets = await getTicketTypes(token);
       setTickets(Tickets);
+      enrollmentInfo();
     }catch(err) {}
   }, []);
 
@@ -52,7 +53,7 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
   }
 
   return (
-    <div>
+    <Container>
       {unavailable?
         <UnavailableTicketsContainer>
           <div>
@@ -112,9 +113,14 @@ export default function TicketTypeSection({ completeReservation, chooseTicket })
           </ThirdInnerContainer>
         </>
       }
-    </div>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  height: 100%;
+  width: 100%;
+`;
 
 const SecondaryTitle = styled.div`
   h2 {
@@ -138,18 +144,16 @@ const SecondaryTitle = styled.div`
 `;
 
 const UnavailableTicketsContainer = styled.div`
-  height: 500px;
+  height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 
   div {
-    height: 46px;
-    width: 399px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
   }
 
   h3 {
@@ -157,6 +161,9 @@ const UnavailableTicketsContainer = styled.div`
     font-size: 20px;
     font-weight: 400;
     color: #8E8E8E;
+    line-height: 23px;
+    letter-spacing: 0em;
+    text-align: center;
   }
 `;
 
