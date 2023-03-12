@@ -18,6 +18,19 @@ export default function Activities() {
         </ActivitiesContainer>
       </Container>
     );
+  } else if(ticketData?.TicketType.isRemote) {
+    return (
+      <Container>
+        <MainTitle>
+          <h1>Escolha de atividades</h1>
+        </MainTitle>
+
+        <ActivitiesContainer>
+          <h5>Sua modalidade de ingresso não necessita escolher</h5>
+          <h5>atividades. Você terá acesso a todas as atividades.</h5>
+        </ActivitiesContainer>
+      </Container>
+    );
   } else {
     return (
       <Container>
