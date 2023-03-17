@@ -1,12 +1,16 @@
 import styled from 'styled-components';
+import Activity from './Activity';
 
 export default function LocalColumn({ localInfo, activities }) {
   return (
     <LocalBox>
       <h1>{localInfo.name}</h1>
-      <div>
+      <section>
+        {activities!== undefined?
+          activities.map((a) => <Activity info={a}/>)
+          : null}
 
-      </div>
+      </section>
     </LocalBox>
   );
 }
@@ -23,11 +27,18 @@ const LocalBox = styled.div`
         color: #7B7B7B; 
         margin-bottom: 7px;
     }
-    div{
-        border: 1px solid #D7D7D7;
+    section{
+        border-left: 1px solid #D7D7D7;
+        border-top: 1px solid #D7D7D7;
+        border-bottom: 1px solid #D7D7D7;
         height: 392px;
-        padding: 10px 0px;
+        padding: 10px 9px;
         overflow-y: scroll;
     }
 
+    :last-child{
+        section{
+            border-right:1px solid #D7D7D7;
+        }        
+    }
 `;

@@ -4,8 +4,7 @@ import ActivitiesDisplay from '../../../components/Activities/ActivitiesDisplay'
 import TicketContext from '../../../contexts/TicketContext';
 
 export default function Activities() {
-  const [date, setDate] = useState(null);
-
+  const [date, setDate] = useState('2023-03-08');
   const { ticketData } = useContext(TicketContext);
 
   if (ticketData === null || ticketData?.status !== 'PAID') {

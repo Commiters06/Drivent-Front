@@ -15,11 +15,11 @@ export default function ActivitiesDisplay({ date }) {
   useEffect(async() => {
     try {
       const localsReceived = await getLocals(userData.token);
-      console.log(localsReceived);
       setLocals(localsReceived);
 
       if(date !== undefined) {
         const activitiesReceived = await getActivities(userData.token, dayjs(date));
+        console.log(activitiesReceived);
         setActivities(activitiesReceived);
       }
     }catch(err) { }
@@ -27,8 +27,8 @@ export default function ActivitiesDisplay({ date }) {
 
   return(
     <ActivitiesBox>
-      {locals !== null ?
-        locals.map((l) =>  <LocalColumn localInfo={l} activities={activities}/>)
+      {locals !== null && activities !== null?
+        locals.map((l) =>  <LocalColumn localInfo={l} activities={activities[l.id]}/>)
         : null}
     </ActivitiesBox>
   );
@@ -37,5 +37,6 @@ export default function ActivitiesDisplay({ date }) {
 const ActivitiesBox = styled.div`
   display: flex;
   overflow-x: scroll;
+
 
 `;
