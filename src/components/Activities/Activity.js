@@ -5,8 +5,8 @@ import { GiCancel } from 'react-icons/gi';
 import { BsCheckCircle } from 'react-icons/bs';
 import { MdExitToApp } from 'react-icons/md';
 
-export default function Activity({ info }) {
-  const [select, setSelect] = useState();
+export default function Activity({ info, activitySelected, changeActivity }) {
+  const [selected, setSelect] = useState(false);
   const [size, setSize] = useState();
   const [color, setColor] = useState();
   
@@ -20,10 +20,15 @@ export default function Activity({ info }) {
     }else{
       setColor('#078632');
     }
+
+    if(info.ibooked) {
+      setSelect(true);
+    }
   }, []);
 
   return(
-    <ActivityBox selected={select} size={size} color={color}>
+    <ActivityBox selected={selected}  disabled={selected} size={size} color={color} choosing={activitySelected === info.id} 
+      onClick={(activitySelected === info.id)?() => changeActivity(-1):() => changeActivity(info.id)}>
       <div>
         <h2>{info.description}</h2>
         <h3>{dayjs(info.hourStart).format('HH:mm')} - {dayjs(info.hourEnd).format('HH:mm')}</h3>
@@ -51,9 +56,9 @@ export default function Activity({ info }) {
   );
 }
 
-const ActivityBox = styled.div`
+const ActivityBox = styled.button`
     padding: 12px 10px;
-    background-color: ${props => props.selected? '#D0FFDB': '#F1F1F1'};
+    background-color: ${props => props.selected? '#D0FFDB': props => props.choosing? '#FFEED2': '#F1F1F1'};
     border-radius: 5px;
     margin-bottom: 10px;
     display: flex;
@@ -61,6 +66,10 @@ const ActivityBox = styled.div`
     cursor: pointer;
 
     height: ${props => props.size};
+
+    &:hover {
+        background-color: ${props => props.selected? '#D0FFDB': props => props.choosing? '#FFEED2': '#CCCCCC'};
+    }
 
     h2{
         font-family: 'Roboto';
@@ -82,22 +91,24 @@ const ActivityBox = styled.div`
 
     div{
         :first-child{
-            width: 80%;
+            width:75%;
             align-self: flex-start;
         }
 
         :last-child{
-            width: 20%;
+            width: 25%;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            font-size: 20px;
+            font-size: 22px;
+            height: 100%;
             color: ${props => props.color};
+            border-left: ${props => props.selected? '1px solid #99E8A1':'1px solid #CFCFCF'};
 
             p{
                 font-family: 'Roboto';
-                font-size: 9px;
+                font-size: 10px;
                 font-weight: 400;
                 text-align: left;
                 margin-top: 5px;

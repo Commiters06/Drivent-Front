@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 import Activity from './Activity';
 
-export default function LocalColumn({ localInfo, activities }) {
+export default function LocalColumn({ localInfo, activities, activitySelected, changeActivity }) {
   return (
     <LocalBox>
       <h1>{localInfo.name}</h1>
       <section>
         {activities!== undefined?
-          activities.map((a) => <Activity info={a}/>)
+          activities.map((a) => <Activity info={a} activitySelected={activitySelected} changeActivity={changeActivity}/>)
           : null}
 
       </section>
@@ -40,5 +40,11 @@ const LocalBox = styled.div`
         section{
             border-right:1px solid #D7D7D7;
         }        
+    }
+
+    button{
+        border: none;
+        width: 100%;
+
     }
 `;
