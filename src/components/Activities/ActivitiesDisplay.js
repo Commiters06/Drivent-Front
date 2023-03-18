@@ -1,8 +1,10 @@
+import { setDate } from 'date-fns';
 import dayjs from 'dayjs';
 import { useContext, useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import UserContext from '../../contexts/UserContext';
-import { getActivities } from '../../services/activities';
+import { getActivities, joinActivity } from '../../services/activities';
 import { getLocals } from '../../services/locals';
 import LocalColumn from './Local';
 
@@ -10,6 +12,7 @@ export default function ActivitiesDisplay({ date }) {
   const [activities, setActivities] = useState(null);
   const [activitySelected, setActivitySelected] = useState(-1);
   const [locals, setLocals] = useState(null);
+  const [render, setRender] = useState(false);
 
   const { userData } = useContext(UserContext);
 
@@ -26,7 +29,19 @@ export default function ActivitiesDisplay({ date }) {
         setActivitySelected(-1);
       }
     }catch(err) {setActivities(null); setActivitySelected(-1);}
-  }, [date]);
+  }, [date, render]);
+
+  async function participateInActivity() {
+    try{
+      await joinActivity(userData.token, activitySelected);
+      toast('Inscrição feita com sucesso');
+      setRender(!render);
+    }catch(err) {
+      if(err?.response?.status === 409) {
+        toast(err.response.data.message);
+      }
+    }
+  }
 
   if(activities !== null && Object.keys(activities).length === 0) {
     return(
@@ -44,7 +59,7 @@ export default function ActivitiesDisplay({ date }) {
           : null}
       </ActivitiesBox>
       {activitySelected !== -1?
-        <ConfirmTicketButton> 
+        <ConfirmTicketButton onClick={async() => await participateInActivity()}> 
           <h1>RESERVAR VAGA</h1>
         </ConfirmTicketButton>
         :null}

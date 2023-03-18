@@ -25,8 +25,7 @@ function DayIcon({ day, chooseDate, daysInfo, id }) {
 
   function defineDay() {
     const numberDay = dayjs(day).day();
-    console.log(1);
-
+    
     switch(numberDay) {
     case 0: return 'Domingo';
     case 1: return 'Segunda';

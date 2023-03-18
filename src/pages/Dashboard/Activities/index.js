@@ -16,8 +16,6 @@ export default function Activities() {
       const daysReceived = await getEventDays();
       setDays(daysReceived);
     }catch(err) { }
-
-    console.log(chosenDate);
   }, [chosenDate]);
 
   if (ticketData === null || ticketData?.status !== 'PAID') {
