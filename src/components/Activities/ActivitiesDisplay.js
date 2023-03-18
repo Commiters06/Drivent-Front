@@ -18,16 +18,26 @@ export default function ActivitiesDisplay({ date }) {
       const localsReceived = await getLocals(userData.token);
       setLocals(localsReceived);
 
-      if(date !== undefined) {
+      if(date !== undefined && date !== null) {
         const activitiesReceived = await getActivities(userData.token, dayjs(date));
-        console.log(activitiesReceived);
         setActivities(activitiesReceived);
+      }else{
+        setActivities(null);
+        setActivitySelected(-1);
       }
-    }catch(err) { }
-  }, []);
+    }catch(err) {setActivities(null); setActivitySelected(-1);}
+  }, [date]);
+
+  if(activities !== null && Object.keys(activities).length === 0) {
+    return(
+      <ActivitiesContainer>
+        <h5>O dia selecionado não tem atividades</h5>
+      </ActivitiesContainer>
+    );
+  };
 
   return(
-    <>
+    <ActivityDisplayStyle>
       <ActivitiesBox>
         {locals !== null && activities !== null?
           locals.map((l) =>  <LocalColumn localInfo={l} activities={activities[l.id]} activitySelected={activitySelected} changeActivity={setActivitySelected}/>)
@@ -38,9 +48,13 @@ export default function ActivitiesDisplay({ date }) {
           <h1>RESERVAR VAGA</h1>
         </ConfirmTicketButton>
         :null}
-    </>
+    </ActivityDisplayStyle>
   );
 }
+
+const ActivityDisplayStyle = styled.div`
+  margin-bottom: 110px;
+`;
 
 const ActivitiesBox = styled.div`
   display: flex;
@@ -65,5 +79,21 @@ const ConfirmTicketButton = styled.button`
     letter-spacing: 0em;
     text-align: center;
     color: #000000;
+  }
+`;
+
+const ActivitiesContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  h5 {
+    font-family: 'Roboto';
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 23px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #8E8E8E;
   }
 `;
