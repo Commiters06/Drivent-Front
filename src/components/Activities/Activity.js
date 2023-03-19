@@ -9,25 +9,17 @@ export default function Activity({ info, activitySelected, changeActivity }) {
   const [selected, setSelect] = useState(false);
   const [size, setSize] = useState();
   const [color, setColor] = useState();
+
+  console.log(info);
   
   useEffect(() => {
     const begin = dayjs(info.hourStart).hour();
     const end = dayjs(info.hourEnd).hour();
     setSize(`${(end-begin)*80+(end-begin-1)*10}px`);
-
-    if(info.limit === 0) {
-      setColor('#CC6666');
-    }else{
-      setColor('#078632');
-    }
-
-    if(info.ibooked) {
-      setSelect(true);
-    }
   }, []);
 
   return(
-    <ActivityBox selected={selected}  disabled={selected} size={size} color={color} choosing={activitySelected === info.id} 
+    <ActivityBox selected={info.iBooked}  disabled={info.iBooked} size={size} color={(info.limit)? '#078632': '#CC6666'} choosing={activitySelected === info.id} 
       onClick={(activitySelected === info.id)?() => changeActivity(-1):() => changeActivity(info.id)}>
       <div>
         <h2>{info.description}</h2>

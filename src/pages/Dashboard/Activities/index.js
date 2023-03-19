@@ -1,11 +1,22 @@
-import { useContext, useState } from 'react';
+import { setDay } from 'date-fns';
+import { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ActivitiesDisplay from '../../../components/Activities/ActivitiesDisplay';
+import DateDisplay from '../../../components/Activities/DateDisplay';
 import TicketContext from '../../../contexts/TicketContext';
+import { getEventDays } from '../../../services/eventApi';
 
 export default function Activities() {
-  const [date, setDate] = useState('2023-03-08');
+  const [days, setDays] = useState(null);
+  const [chosenDate, setChosenDate] = useState(null);
   const { ticketData } = useContext(TicketContext);
+
+  useEffect(async() => {
+    try{
+      const daysReceived = await getEventDays();
+      setDays(daysReceived);
+    }catch(err) { }
+  }, [chosenDate]);
 
   if (ticketData === null || ticketData?.status !== 'PAID') {
     return (
@@ -41,8 +52,9 @@ export default function Activities() {
         </MainTitle>
 
         <ActivitiesContainer>
+          <DateDisplay daysRender={days} chooseDate={setChosenDate} chosenDate={chosenDate}/>
 
-          <ActivitiesDisplay date={date}/>
+          <ActivitiesDisplay date={chosenDate}/>
         </ActivitiesContainer>
       </Container>
     );
@@ -71,7 +83,7 @@ const ActivitiesContainer = styled.div`
     font-weight: 400;
     line-height: 23px;
     letter-spacing: 0em;
-    text-align: center;
+    text-align: left;
     color: #8E8E8E;
   }
 `;
