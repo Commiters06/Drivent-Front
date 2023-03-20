@@ -26,7 +26,7 @@ export default function Activity({ info, activitySelected, changeActivity }) {
         <h3>{dayjs(info.hourStart).format('HH:mm')} - {dayjs(info.hourEnd).format('HH:mm')}</h3>
       </div>
       <div>
-        {info.ibooked?
+        {info.iBooked?
           <>
             <BsCheckCircle/>
             <p>inscrito</p>
